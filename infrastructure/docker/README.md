@@ -23,6 +23,8 @@ pnpm stack:reset   # stop, delete all volumes and the generated .generated/ file
 
 Credentials are generated per machine by `init-env.sh` into `infrastructure/docker/.env` (git-ignored). No credentials are committed.
 
+**File permissions:** on Linux and macOS, `init-env.sh` makes `.env` and `.generated/s3.json` readable by your user only (mode 600, `.generated/` mode 700). On Windows the checkout usually sits on NTFS, where these modes are not enforced: Git Bash ignores `chmod`, and WSL applies it only on drives mounted with the `metadata` option. There, access is governed by the NTFS permissions of your user profile, so keep the checkout inside your own profile folder (for example `C:\Users\<you>\...`), not in a shared location.
+
 **Object storage:** the plan named MinIO, but the official MinIO images are no longer pullable from Docker Hub. SeaweedFS (Apache-2.0, S3 API) is used instead. Object-lock behaviour needed by audit export tests (O2, AU-8) must be confirmed against SeaweedFS when O2 starts.
 
 **Data rule (D12):** only synthetic, non-explicit data may be loaded into this stack.

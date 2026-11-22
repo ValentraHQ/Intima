@@ -20,7 +20,11 @@ fi
 
 # shellcheck disable=SC1091
 source .env
+# s3.json holds the S3 admin key pair: owner-only directory (700) and file (600).
+# The object-storage container runs as root, so it can still read the bind-mounted file.
+umask 077
 mkdir -p .generated
+chmod 700 .generated
 cat > .generated/s3.json <<JSON
 {
   "identities": [
@@ -32,4 +36,4 @@ cat > .generated/s3.json <<JSON
   ]
 }
 JSON
-chmod 644 .generated/s3.json
+chmod 600 .generated/s3.json
