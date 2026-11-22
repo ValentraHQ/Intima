@@ -88,7 +88,9 @@ services:
       - 'object-storage-data:/data'
       - './.generated/s3.json:/etc/seaweedfs/s3.json:ro'
     healthcheck:
-      test: ['CMD-SHELL', 'wget -q -O /dev/null http://localhost:9333/cluster/status']
+      # 127.0.0.1, not localhost: localhost resolves to ::1 first in this image, while
+      # SeaweedFS listens on IPv4 only, so a localhost probe is refused and never healthy.
+      test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1:9333/cluster/status']
       interval: 5s
       timeout: 3s
       retries: 30
