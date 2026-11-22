@@ -5,7 +5,7 @@
 
 ## Ground rules
 
-1. Work only inside approved scope (see `docs/requirements/decision-register.md`).
+1. Work only inside approved scope. The decision register that records it is not in this repository yet: it is kept by the Product Owner with the Phase 0 documents and is due to move to `docs/requirements/decision-register.md` in Sprint 1 WP6 (see [docs](docs/README.md)). Until then, ask the Product Owner before starting work whose approval you can't confirm.
 2. **Synthetic, non-explicit data and media only (D12).** Never commit real user data, performer records, identity documents, adult media or payment data. Video files are git-ignored; fixtures are generated.
 3. Never commit secrets. Use `.env` files locally (git-ignored); CI uses GitHub secrets.
 4. No production infrastructure, paid services, `terraform apply` against cloud, or image publishing without explicit Product Owner authorization.
