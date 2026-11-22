@@ -16,6 +16,7 @@
 - Branch names: `<sprint-or-type>/<short-description>`, e.g. `sprint1/wp1-repo-tooling`.
 - Commits and PR titles follow [Conventional Commits](https://www.conventionalcommits.org/) (`pnpm commitlint` checks them).
 - Every PR fills the template, links CI evidence, and must pass all required checks.
+- **CI evidence is required for acceptance and cannot be replaced by local runs.** Status (2026-11-22): the GitHub Actions workflow is not in the repository yet, because it can only be added by an account whose credentials carry the `workflow` scope. Until it lands, PRs report local verification results, labelled as local (machine, OS, tool versions, commands, exit codes), and stay unaccepted until a CI run on the same commit is linked. Do not describe local results as CI results.
 
 ## Review policy
 
