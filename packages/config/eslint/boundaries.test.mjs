@@ -20,6 +20,12 @@ test('module-boundaries', () => {
       { code: "import { z } from '../../shared/util';", filename: `${API}/billing/checkout.ts` },
       { code: "import { z } from './lib';", filename: '/repo/apps/web/src/page.ts' },
       { code: "import { z } from '../src/x';", filename: '/repo/packages/ui/test/a.ts' },
+      { code: 'const m = import(`../ledger`);', filename: `${API}/payout/batch.ts` },
+      { code: 'const m = import(`../ledger/index.js`);', filename: `${API}/payout/batch.ts` },
+      { code: 'const m = import(`./local`);', filename: `${API}/payout/batch.ts` },
+      // Computed sources cannot be resolved statically and are not checked.
+      { code: 'const m = import(`../${name}/journal`);', filename: `${API}/payout/batch.ts` },
+      { code: "import { z } from '@intima/ui';", filename: '/repo/apps/web/src/page.ts' },
     ],
     invalid: [
       {
@@ -36,6 +42,16 @@ test('module-boundaries', () => {
         code: "const m = import('../ledger/journal');",
         filename: `${API}/payout/batch.ts`,
         errors: [{ messageId: 'moduleInternal' }],
+      },
+      {
+        code: 'const m = import(`../ledger/journal`);',
+        filename: `${API}/payout/batch.ts`,
+        errors: [{ messageId: 'moduleInternal' }],
+      },
+      {
+        code: 'const m = import(`../../../../web/src/page`);',
+        filename: `${API}/payout/batch.ts`,
+        errors: [{ messageId: 'crossApp' }],
       },
       {
         code: "import { a } from '../../../api/src/main';",
@@ -87,6 +103,11 @@ test('module-boundaries (Windows-style paths)', () => {
       },
       {
         code: "const m = import('../ledger/journal');",
+        filename: `${WIN_API}\\payout\\batch.ts`,
+        errors: [{ messageId: 'moduleInternal' }],
+      },
+      {
+        code: 'const m = import(`../ledger/journal`);',
         filename: `${WIN_API}\\payout\\batch.ts`,
         errors: [{ messageId: 'moduleInternal' }],
       },

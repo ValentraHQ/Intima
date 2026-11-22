@@ -59,6 +59,20 @@ function check(file, specifier) {
   return null;
 }
 
+/**
+ * The specifier of an import source when it is known statically: a string literal, or
+ * a template literal without expressions (`import(\`../x\`)`). Computed sources
+ * return null and are not checked.
+ */
+function staticSpecifier(source) {
+  if (!source) return null;
+  if (source.type === 'Literal') return typeof source.value === 'string' ? source.value : null;
+  if (source.type === 'TemplateLiteral' && source.expressions.length === 0) {
+    return source.quasis[0]?.value.cooked ?? null;
+  }
+  return null;
+}
+
 /** @type {import('eslint').Rule.RuleModule} */
 export const moduleBoundariesRule = {
   meta: {
@@ -76,15 +90,16 @@ export const moduleBoundariesRule = {
   create(context) {
     const filename = context.filename;
     const report = (node, source) => {
-      if (!source || typeof source.value !== 'string') return;
-      const problem = check(filename, source.value);
+      const specifier = staticSpecifier(source);
+      if (specifier === null) return;
+      const problem = check(filename, specifier);
       if (problem) context.report({ node: source, ...problem });
     };
     return {
       ImportDeclaration: (node) => report(node, node.source),
       ExportNamedDeclaration: (node) => report(node, node.source),
       ExportAllDeclaration: (node) => report(node, node.source),
-      ImportExpression: (node) => report(node, node.source.type === 'Literal' ? node.source : null),
+      ImportExpression: (node) => report(node, node.source),
     };
   },
 };
