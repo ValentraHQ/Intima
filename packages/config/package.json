@@ -1,0 +1,30 @@
+{
+  "name": "@intima/config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared TypeScript, ESLint and module-boundary configuration for INTIMA",
+  "exports": {
+    "./tsconfig/base.json": "./tsconfig/base.json",
+    "./tsconfig/node.json": "./tsconfig/node.json",
+    "./eslint": "./eslint/index.mjs",
+    "./eslint/boundaries": "./eslint/boundaries.mjs"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "test": "node --test eslint/boundaries.test.mjs"
+  },
+  "dependencies": {
+    "@eslint/js": "^9.39.5",
+    "globals": "^17.14.0",
+    "typescript-eslint": "^8.73.0"
+  },
+  "peerDependencies": {
+    "eslint": "^9.39.5",
+    "typescript": "~5.9.3"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.5",
+    "typescript": "~5.9.3"
+  }
+}

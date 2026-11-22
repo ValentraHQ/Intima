@@ -1,0 +1,75 @@
+/**
+ * INTIMA module-boundary rule (ADR-001, SDD §3).
+ *
+ * 1. Code inside `src/modules/<A>/` may import another module `<B>` only through
+ *    its public entry point (`src/modules/<B>` or `src/modules/<B>/index`).
+ * 2. An app (`apps/<X>`) may not import from another app (`apps/<Y>`).
+ * 3. A shared package (`packages/<P>`) may not import from any app.
+ *
+ * Only relative imports are inspected; workspace packages (`@intima/*`) are the
+ * sanctioned way to share code between apps.
+ */
+import path from 'node:path';
+
+const MODULE_RE = /^(.*[\\/]src[\\/]modules)[\\/]([^\\/]+)(?:[\\/](.*))?$/;
+const APP_RE = /^(.*)[\\/]apps[\\/]([^\\/]+)(?:[\\/].*)?$/;
+const PKG_RE = /^(.*)[\\/]packages[\\/]([^\\/]+)(?:[\\/].*)?$/;
+const PUBLIC_ENTRY_RE = /^index(\.[cm]?[jt]sx?)?$/;
+
+function check(fromFile, specifier) {
+  if (!specifier.startsWith('.')) return null;
+  const target = path.resolve(path.dirname(fromFile), specifier);
+
+  const fromMod = MODULE_RE.exec(fromFile);
+  const toMod = MODULE_RE.exec(target);
+  if (fromMod && toMod && fromMod[1] === toMod[1] && fromMod[2] !== toMod[2]) {
+    const rest = toMod[3];
+    if (rest !== undefined && rest !== '' && !PUBLIC_ENTRY_RE.test(rest)) {
+      return { messageId: 'moduleInternal', data: { from: fromMod[2], to: toMod[2] } };
+    }
+  }
+
+  const fromApp = APP_RE.exec(fromFile);
+  const toApp = APP_RE.exec(target);
+  if (fromApp && toApp && fromApp[1] === toApp[1] && fromApp[2] !== toApp[2]) {
+    return { messageId: 'crossApp', data: { from: fromApp[2], to: toApp[2] } };
+  }
+
+  const fromPkg = PKG_RE.exec(fromFile);
+  if (fromPkg && toApp && fromPkg[1] === toApp[1]) {
+    return { messageId: 'packageToApp', data: { from: fromPkg[2], to: toApp[2] } };
+  }
+  return null;
+}
+
+/** @type {import('eslint').Rule.RuleModule} */
+export const moduleBoundariesRule = {
+  meta: {
+    type: 'problem',
+    docs: { description: 'Enforce INTIMA module and app boundaries' },
+    schema: [],
+    messages: {
+      moduleInternal:
+        "Module '{{from}}' may only import module '{{to}}' through its public entry point (modules/{{to}}/index).",
+      crossApp:
+        "App '{{from}}' must not import from app '{{to}}'. Share code through a package in packages/.",
+      packageToApp: "Package '{{from}}' must not import from app '{{to}}'.",
+    },
+  },
+  create(context) {
+    const filename = context.filename;
+    const report = (node, source) => {
+      if (!source || typeof source.value !== 'string') return;
+      const problem = check(filename, source.value);
+      if (problem) context.report({ node: source, ...problem });
+    };
+    return {
+      ImportDeclaration: (node) => report(node, node.source),
+      ExportNamedDeclaration: (node) => report(node, node.source),
+      ExportAllDeclaration: (node) => report(node, node.source),
+      ImportExpression: (node) => report(node, node.source.type === 'Literal' ? node.source : null),
+    };
+  },
+};
+
+export const intimaPlugin = { rules: { 'module-boundaries': moduleBoundariesRule } };
