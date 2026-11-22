@@ -1,0 +1,17 @@
+# INTIMA code owners.
+# High-risk paths (ADR-003, ADR-008, D4) require review from code owners.
+# Policy target: 2 approving reviews on these paths. With a single maintainer this
+# cannot be enforced yet; see CONTRIBUTING.md "Review policy".
+
+*                                         @Win1817
+
+/apps/api/src/modules/ledger/             @Win1817
+/apps/api/src/modules/billing/            @Win1817
+/apps/api/src/modules/entitlement/        @Win1817
+/apps/api/src/modules/compliance/         @Win1817
+/apps/api/src/modules/moderation/         @Win1817
+/apps/api/src/modules/audit/              @Win1817
+/apps/api/src/database/migrations/        @Win1817
+/.github/                                 @Win1817
+/infrastructure/                          @Win1817
+/docs/requirements/decision-register.md   @Win1817

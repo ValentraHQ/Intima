@@ -1,0 +1,28 @@
+# Normalize line endings in the repository and in every working tree.
+# Prettier, shell scripts and container entrypoints expect LF, so text files are
+# checked out with LF on all platforms, regardless of core.autocrlf.
+* text=auto eol=lf
+
+# Shell scripts run inside Linux containers and Git Bash/WSL; CRLF breaks them.
+*.sh text eol=lf
+
+# Windows-only scripts keep CRLF so cmd.exe and PowerShell handle them correctly.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary assets: never normalize or diff as text.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.mp4 binary
+*.webm binary
+*.zip binary
+
+# Generated lockfile: keep LF; GitHub collapses it in PR diffs.
+pnpm-lock.yaml text eol=lf linguist-generated=true

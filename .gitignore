@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.turbo/
+coverage/
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+# Never commit real media or identity data (D12). Synthetic fixtures are generated, not stored.
+*.mp4
+*.mov
+*.mkv
+*.webm
