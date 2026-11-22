@@ -40,6 +40,10 @@ services:
 
   rabbitmq:
     image: rabbitmq:4.1.4-management-alpine
+    # Fixed hostname: RabbitMQ names its node (rabbit@<hostname>) and its data directory
+    # after the hostname. Without this, each recreated container gets a random hostname
+    # and starts with an empty node, hiding queues and messages kept in the volume.
+    hostname: intima-rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: intima
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?run infrastructure/docker/init-env.sh}
