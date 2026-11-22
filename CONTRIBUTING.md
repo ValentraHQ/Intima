@@ -32,7 +32,7 @@ pnpm stack:up            # local services in Docker (see infrastructure/docker)
 pnpm stack:reset         # stop and delete all local data
 ```
 
-Requirements: Node.js 22 (`.nvmrc`), Docker with Compose v2.
+Requirements: Node.js 22 (`.nvmrc`), Docker with Compose v2, and `bash` with `openssl` for `pnpm stack:up` (on Windows: Git Bash or WSL, see [infrastructure/docker](infrastructure/docker/README.md)).
 
 ## Module boundaries
 

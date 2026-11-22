@@ -17,7 +17,7 @@
     "commitlint": "commitlint",
     "stack:up": "bash infrastructure/docker/init-env.sh && docker compose -f infrastructure/docker/compose.yaml --env-file infrastructure/docker/.env up -d --wait --wait-timeout 180",
     "stack:down": "docker compose -f infrastructure/docker/compose.yaml --env-file infrastructure/docker/.env down",
-    "stack:reset": "docker compose -f infrastructure/docker/compose.yaml --env-file infrastructure/docker/.env down -v --remove-orphans && rm -rf infrastructure/docker/.generated",
+    "stack:reset": "docker compose -f infrastructure/docker/compose.yaml --env-file infrastructure/docker/.env down -v --remove-orphans && node infrastructure/docker/clean-generated.mjs",
     "stack:ps": "docker compose -f infrastructure/docker/compose.yaml --env-file infrastructure/docker/.env ps",
     "stack:env": "bash infrastructure/docker/init-env.sh"
   },

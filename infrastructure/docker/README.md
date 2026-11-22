@@ -16,8 +16,10 @@ Local-only services for INTIMA development (Sprint 1, T1.4). Every port binds to
 pnpm stack:up      # generates .env with random local credentials on first run, then starts and waits for health
 pnpm stack:ps      # status
 pnpm stack:down    # stop, keep data
-pnpm stack:reset   # stop and delete all volumes
+pnpm stack:reset   # stop, delete all volumes and the generated .generated/ files (.env is kept)
 ```
+
+**Bash and OpenSSL are required** for `stack:up` and `stack:env`, because they run `init-env.sh`. On Linux and macOS they are already present. On Windows, use Git for Windows (Git Bash ships `bash` and `openssl`) or WSL, and make sure `bash` on `PATH` resolves to one of them: run `where bash` in `cmd`. If only `C:\Windows\System32\bash.exe` appears, that is the WSL launcher and needs a WSL distribution with `openssl`. The other stack scripts use only Docker and Node, so they work in any shell.
 
 Credentials are generated per machine by `init-env.sh` into `infrastructure/docker/.env` (git-ignored). No credentials are committed.
 
