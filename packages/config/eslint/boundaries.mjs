@@ -16,9 +16,26 @@ const APP_RE = /^(.*)[\\/]apps[\\/]([^\\/]+)(?:[\\/].*)?$/;
 const PKG_RE = /^(.*)[\\/]packages[\\/]([^\\/]+)(?:[\\/].*)?$/;
 const PUBLIC_ENTRY_RE = /^index(\.[cm]?[jt]sx?)?$/;
 
-function check(fromFile, specifier) {
+const WIN_ABSOLUTE_RE = /^(?:[A-Za-z]:[\\/]|\\\\)/;
+
+/**
+ * Pick the path flavour from the filename itself, not from the host OS, so that the
+ * same filename resolves identically on Windows and Linux (ESLint passes `C:\...` on
+ * Windows and `/...` elsewhere; tests may use either on any host).
+ */
+function pathFor(file) {
+  if (WIN_ABSOLUTE_RE.test(file)) return path.win32;
+  if (file.startsWith('/')) return path.posix;
+  return path;
+}
+
+function check(file, specifier) {
   if (!specifier.startsWith('.')) return null;
-  const target = path.resolve(path.dirname(fromFile), specifier);
+  const p = pathFor(file);
+  // Normalize the importing file with the same resolver as the target, so both sides
+  // of every comparison below use identical separators and drive prefixes.
+  const fromFile = p.resolve(file);
+  const target = p.resolve(p.dirname(fromFile), specifier);
 
   const fromMod = MODULE_RE.exec(fromFile);
   const toMod = MODULE_RE.exec(target);
