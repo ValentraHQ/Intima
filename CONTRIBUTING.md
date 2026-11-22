@@ -36,4 +36,11 @@ Requirements: Node.js 22 (`.nvmrc`), Docker with Compose v2, and `bash` with `op
 
 ## Module boundaries
 
-`apps/api/src/modules/<name>` is one module. Other modules import it only through `modules/<name>/index`. Apps never import other apps, and packages never import apps. ESLint rule `intima/module-boundaries` enforces this.
+`apps/api/src/modules/<name>` is one module. Other modules import it only through `modules/<name>/index`. Apps never import other apps, and packages never import apps.
+
+ESLint rule `intima/module-boundaries` enforces this for:
+
+- relative imports, re-exports and dynamic imports whose path is a string or a template literal without `${}` expressions;
+- any import of an app by package name (`@intima/api`, `@intima/web`, `@intima/admin`, `@intima/media-worker`), including deep paths such as `@intima/api/src/modules/...`.
+
+It does **not** check dynamic imports with computed paths (for example `` import(`../${name}`) ``). Don't write them across module boundaries. Deep imports into shared packages (`@intima/contracts/...`) are blocked by each package's `exports` map rather than by this rule.

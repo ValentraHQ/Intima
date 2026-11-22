@@ -6,8 +6,13 @@
  * 2. An app (`apps/<X>`) may not import from another app (`apps/<Y>`).
  * 3. A shared package (`packages/<P>`) may not import from any app.
  *
- * Only relative imports are inspected; workspace packages (`@intima/*`) are the
- * sanctioned way to share code between apps.
+ * 4. Nothing may import an app by its package name (`@intima/api`, `@intima/web`, ...,
+ *    including deep paths such as `@intima/api/src/modules/<B>/internal`). Apps are
+ *    not libraries, and such an import would otherwise bypass rules 1-3.
+ *
+ * Relative imports are resolved and checked against rules 1-3. Other bare specifiers
+ * are not inspected: shared packages (`@intima/contracts`, `@intima/ui`, ...) are the
+ * sanctioned way to share code, and their `exports` maps block deep imports.
  */
 import path from 'node:path';
 
@@ -15,6 +20,9 @@ const MODULE_RE = /^(.*[\\/]src[\\/]modules)[\\/]([^\\/]+)(?:[\\/](.*))?$/;
 const APP_RE = /^(.*)[\\/]apps[\\/]([^\\/]+)(?:[\\/].*)?$/;
 const PKG_RE = /^(.*)[\\/]packages[\\/]([^\\/]+)(?:[\\/].*)?$/;
 const PUBLIC_ENTRY_RE = /^index(\.[cm]?[jt]sx?)?$/;
+
+// Keep in sync with apps/*: each app's package name is `@intima/<dir>`.
+const APP_PACKAGE_RE = /^@intima\/(api|web|admin|media-worker)(?:\/.*)?$/;
 
 const WIN_ABSOLUTE_RE = /^(?:[A-Za-z]:[\\/]|\\\\)/;
 
@@ -30,6 +38,8 @@ function pathFor(file) {
 }
 
 function check(file, specifier) {
+  const appPkg = APP_PACKAGE_RE.exec(specifier);
+  if (appPkg) return { messageId: 'appPackage', data: { specifier, to: appPkg[1] } };
   if (!specifier.startsWith('.')) return null;
   const p = pathFor(file);
   // Normalize the importing file with the same resolver as the target, so both sides
@@ -85,6 +95,8 @@ export const moduleBoundariesRule = {
       crossApp:
         "App '{{from}}' must not import from app '{{to}}'. Share code through a package in packages/.",
       packageToApp: "Package '{{from}}' must not import from app '{{to}}'.",
+      appPackage:
+        "Do not import app '{{to}}' by package name ('{{specifier}}'). Apps are not libraries; share code through a package in packages/.",
     },
   },
   create(context) {

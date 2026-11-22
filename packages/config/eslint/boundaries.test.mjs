@@ -54,6 +54,21 @@ test('module-boundaries', () => {
         errors: [{ messageId: 'crossApp' }],
       },
       {
+        code: "import { r } from '@intima/api/src/modules/ledger/internal/repo';",
+        filename: `${API}/billing/checkout.ts`,
+        errors: [{ messageId: 'appPackage' }],
+      },
+      {
+        code: "import { a } from '@intima/api';",
+        filename: '/repo/apps/web/src/page.ts',
+        errors: [{ messageId: 'appPackage' }],
+      },
+      {
+        code: 'const m = import(`@intima/web/src/page`);',
+        filename: '/repo/packages/ui/src/a.ts',
+        errors: [{ messageId: 'appPackage' }],
+      },
+      {
         code: "import { a } from '../../../api/src/main';",
         filename: '/repo/apps/web/src/lib/a.ts',
         errors: [{ messageId: 'crossApp' }],
